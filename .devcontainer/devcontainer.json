@@ -8,7 +8,10 @@
     "vscode": {
       "extensions": [
         "redhat.ansible"
-      ]
+      ],
+      "settings": {
+        "ansible.python.interpreterPath": "/usr/bin/python3"
+      }
     }
   },
   "remoteUser": "vscode",
