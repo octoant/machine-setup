@@ -5,6 +5,10 @@
   },
   "customizations": {
     "vscode": {
+      "extensions": [
+        "eamodio.gitlens",
+        "redhat.ansible"
+      ]
     }
   },
   "remoteUser": "vscode",
