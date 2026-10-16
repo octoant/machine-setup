@@ -1,0 +1,6 @@
+---
+# homebrew must already be installed and must not run as root.
+- name: darwin | Install packages
+  community.general.homebrew:
+    name: "{{ packages_common + packages_darwin + packages_extra }}"
+    state: present

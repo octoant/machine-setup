@@ -1,0 +1,15 @@
+---
+- name: Install packages
+  hosts: workstation
+  tags: base
+  gather_facts: false  # done in pre_tasks so that it also runs with --tags
+  pre_tasks:
+    - name: Gather facts
+      ansible.builtin.gather_facts:
+      tags: always
+
+  tasks:
+    - name: Install packages
+      ansible.builtin.import_role:
+        name: packages
+      tags: packages

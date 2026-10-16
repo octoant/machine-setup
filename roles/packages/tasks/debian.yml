@@ -1,0 +1,13 @@
+---
+- name: Install packages with apt
+  become: true
+  block:
+    - name: debian | Refresh the apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: "{{ packages_apt_cache_valid_time }}"
+
+    - name: debian | Install packages
+      ansible.builtin.apt:
+        name: "{{ packages_common + packages_debian + packages_extra }}"
+        state: present

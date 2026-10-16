@@ -1,0 +1,5 @@
+---
+# Constants of this role, not meant to be overridden.
+packages_supported_os_families:
+  - Debian
+  - Darwin
