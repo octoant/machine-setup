@@ -1,0 +1,86 @@
+---
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (yamllint + ansible-lint)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install tooling
+        run: pip install -r requirements.txt
+
+      - name: yamllint
+        run: yamllint .
+
+      - name: ansible-lint
+        run: ansible-lint
+
+  integration:
+    name: Integration (${{ matrix.family }}, ${{ matrix.os }})
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-22.04, family: Debian }
+          - { os: ubuntu-24.04, family: Debian }
+          - { os: ubuntu-latest, family: Debian }
+          - { os: macos-latest, family: Darwin }
+    env:
+      PLAY: ansible-playbook -i inventory/local playbooks/site.yml
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install tooling
+        run: pip install -r requirements.txt
+
+      - name: Detected OS family matches the matrix entry
+        run: |
+          ansible -i inventory/local workstation -m ansible.builtin.setup -a 'filter=ansible_os_family' | tee facts.log
+          grep -q '"ansible_os_family": "${{ matrix.family }}"' facts.log
+
+      - name: Syntax check
+        run: $PLAY --syntax-check
+
+      - name: Task list
+        run: $PLAY --list-tasks
+
+      - name: Dry run (check mode)
+        run: $PLAY --check --diff
+
+      - name: Apply
+        run: $PLAY
+
+      - name: Apply again (must change nothing)
+        run: |
+          $PLAY | tee second-run.log
+          grep -Eq 'changed=0[[:space:]]+unreachable=0[[:space:]]+failed=0' second-run.log

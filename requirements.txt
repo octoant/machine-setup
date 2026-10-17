@@ -1,4 +1,4 @@
 # "~=" allows patch/minor updates but never the next major version.
-ansible-core~=2.15
+ansible-core~=2.16
 ansible-lint~=26.10
 yamllint~=1.38
