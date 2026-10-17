@@ -64,6 +64,9 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Detected OS family matches the matrix entry
+        env:
+          # ansible.cfg switches output to YAML; force JSON so the grep below is stable.
+          ANSIBLE_CALLBACK_RESULT_FORMAT: json
         run: |
           ansible -i inventory/local workstation -m ansible.builtin.setup -a 'filter=ansible_os_family' | tee facts.log
           grep -q '"ansible_os_family": "${{ matrix.family }}"' facts.log
