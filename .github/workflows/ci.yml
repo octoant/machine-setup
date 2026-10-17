@@ -18,7 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
           cache: pip
@@ -54,7 +55,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Homebrew (macOS only)
+        if: startsWith(matrix.os, 'macos')
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
           cache: pip
