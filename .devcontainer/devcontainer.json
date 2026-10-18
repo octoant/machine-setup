@@ -6,6 +6,20 @@
   },
   "customizations": {
     "vscode": {
+      "extensions": [
+        "github.vscode-github-actions",
+        "redhat.ansible"
+      ],
+      "settings": {
+        "ansible.python.interpreterPath": "/usr/bin/python3",
+        "files.associations": {
+          "**/playbooks/*.yml": "ansible",
+          "**/roles/*/tasks/*.yml": "ansible",
+          "**/roles/*/handlers/*.yml": "ansible",
+          "**/roles/*/defaults/*.yml": "ansible",
+          "**/roles/*/vars/*.yml": "ansible"
+        }
+      }
     }
   },
   "remoteUser": "vscode",
