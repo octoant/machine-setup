@@ -1,0 +1,16 @@
+---
+# Packages whose name is identical in each package manager.
+packages_common:
+  - curl
+  - wget
+
+# OS-specific packages (names differ between package managers).
+packages_debian:
+  - build-essential
+  - ca-certificates
+packages_darwin: []
+
+# Your own additions, usually set in inventory group_vars.
+packages_extra: []
+
+packages_apt_cache_valid_time: 3600

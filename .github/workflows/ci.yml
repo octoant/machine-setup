@@ -14,6 +14,7 @@ jobs:
   lint:
     name: Linting (yamllint + ansible-lint)
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -32,3 +33,48 @@ jobs:
 
       - name: ansible-lint
         run: ansible-lint
+
+  integration:
+    name: Integration (${{ matrix.os }})
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-22.04
+          - ubuntu-24.04
+          - ubuntu-latest
+          - macos-15
+          - macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install tools
+        run: pip install -r requirements.txt
+
+      - name: Install Ansible collections
+        run: make deps
+
+      - name: Syntax check
+        run: make syntax
+
+      - name: List tasks
+        run: make list
+
+      - name: Dry run (check mode)
+        run: make check
+
+      - name: Apply
+        run: make apply
+
+      - name: Verify idempotence
+        run: make apply | grep -Eq 'changed=0[[:space:]]+unreachable=0[[:space:]]+failed=0'

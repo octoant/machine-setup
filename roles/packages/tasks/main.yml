@@ -1,0 +1,10 @@
+---
+- name: Fail early on unsupported operating systems
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] in packages_supported_os_families
+    fail_msg: "Unsupported OS family: {{ ansible_facts['os_family'] }}"
+    quiet: true
+
+- name: Install packages for this OS family
+  ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] | lower }}.yml"
