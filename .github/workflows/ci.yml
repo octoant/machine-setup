@@ -77,4 +77,4 @@ jobs:
         run: make apply
 
       - name: Verify idempotence
-        run: make apply | grep -Eq 'changed=0[[:space:]]+unreachable=0[[:space:]]+failed=0
+        run: make apply | grep -Eq 'changed=0[[:space:]]+unreachable=0[[:space:]]+failed=0'
