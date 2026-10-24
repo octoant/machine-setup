@@ -1,10 +1,13 @@
 ---
-- name: Fail early on unsupported operating systems
+- name: Validate supported platforms
   ansible.builtin.assert:
     that:
-      - ansible_facts['os_family'] in packages_supported_os_families
-    fail_msg: "Unsupported OS family: {{ ansible_facts['os_family'] }}"
+      - ansible_facts['distribution'] in packages_supported_platforms.get(ansible_facts['os_family'], [])
+    fail_msg: "Unsupported platform: {{ ansible_facts['distribution'] }} ({{ ansible_facts['os_family'] }})"
     quiet: true
 
-- name: Install packages for this OS family
-  ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] | lower }}.yml"
+- name: Include platform-specific package tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution'] | lower }}.yml"
+    - "{{ ansible_facts['os_family'] | lower }}.yml"
